@@ -81,5 +81,5 @@ The data that must be present in the versioning file (most commonly named `Versi
 The most efficient way to use VersionUpdater is as a script step in Xcode. To ensure proper timing synchronization (eg, the build date is shown in the most current build), the script step *must* be executed before the compile step.
 
 VersionUpdater takes two command line parameters: 
-1) The project's version information file (usually `Versioning.swift`)
-2) an optional read me file. The version information file must be the first parameter, and if specified, the read me file the second parameter.
+1) The project's version information file (usually `Versioning.swift`) that must be a `.swift` file.
+2) An optional read me file. The version information file must be the first parameter, and if specified, the read me file the second parameter. This must be a markdown file.
