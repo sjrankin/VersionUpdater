@@ -27,6 +27,7 @@ VersionUpdater needs the specific strings below to be present in the version fil
 VersionUpdate needs the specific string below to be present in the read me file.
 
 |String|Symbolic|Use|Type|
+|:--|:--|:--|:--|
 |`Most recent build:`|`.MostRecentBuild`|The text that identifies the line to update with build information.|`String`|
 
 ### Supplied functions
