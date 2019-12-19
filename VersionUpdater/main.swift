@@ -3,7 +3,7 @@
 //  VersionUpdater
 //
 //  Created by Stuart Rankin on 2/24/18.
-//  Copyright © 2018 Stuart Rankin. All rights reserved.
+//  Copyright © 2018, 2019 Stuart Rankin. All rights reserved.
 //
 
 /// This program reads a Swift file with specific versioning information (see `GetLinePrefix` for exact strings searched for)
@@ -44,6 +44,7 @@ enum SpecificLines
 let Months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
 /// Returns the line prefix for specific lines that contain information we need/modify.
+/// - Parameter Specific: The type of line string to return.
 func GetLinePrefix(Specific: SpecificLines) -> String
 {
     switch Specific
@@ -133,19 +134,30 @@ func GetStringValue(_ Line: String) -> String?
     return SValue
 }
 
+/// Quotation character.
 let Quote = "\""
+/// Current time.
 let Now = Date()
+/// Calendar used for time-zone specific dates and times.
 let Cal = Calendar.current
+/// Command line arguments used to gather information and write versioning data.
 let Arguments = CommandLine.arguments
 
+/// Default version file name.
 var VersionFileName = "Versioning.swift"
+/// Default read me file name.
 var ReadmeFileName = "README.md"
+/// Found the versioning file flag.
 var FoundVersioning = false
+/// Found the read me file file.
 var FoundReadme = false
+/// URL of the version file.
 var VersionFileURL: URL? = nil
+/// URL of the read me file.
 var ReadmeFileURL: URL? = nil
 
-// Read the command line arguments and look for the specific read me and versioning files.
+/// Read the command line arguments and look for the specific read me and versioning files.
+/// Main entry point for the program.
 for arg in CommandLine.arguments
 {
     let SomeURL = URL(fileURLWithPath: arg)
@@ -172,15 +184,23 @@ for arg in CommandLine.arguments
     }
 }
 
+/// The major version number from the version file.
 var VersionMajor = ""
+/// The minor version number from the version file.
 var VersionMinor = ""
+/// The version tag from the version file.
 var VersionTag = ""
+/// The build date from the version file.
 var Built = ""
+/// The build time from the version file.
 var BuiltTime = ""
+/// Build sequence from the version file (also known as build number).
 var BuildSequence = ""
 
+//If versioning information was found, continue with processing.
 if FoundVersioning
 {
+    //Read the versioning information.
     var Lines: [String]!
     var blob: String = ""
     print("Attempting to read \(VersionFileURL!.path)")
@@ -302,6 +322,7 @@ if FoundVersioning
     NewBuildID = NewBuildID + UUID().uuidString + Quote
     Lines[BuildIDLine!] = NewBuildID
     
+    //Create a new file from the modified data.
     var FinalContents: String = ""
     var Index = 0
     for Line in Lines
@@ -319,6 +340,7 @@ if FoundVersioning
         Index = Index + 1
     }
     
+    //Save the updated version file.
     print("Writing results to \((VersionFileURL)!)")
     let Contents: NSString = FinalContents as NSString
     do
@@ -335,6 +357,7 @@ else
     print("No Versioning file found.")
 }
 
+//If a read me file was found, update specific lines.
 if FoundReadme
 {
     if !FoundVersioning
@@ -342,6 +365,8 @@ if FoundReadme
         print("Unable to update \((ReadmeFileURL)!) due to lack of versioning information.")
         exit(EXIT_FAILURE)
     }
+    
+    //Read the read me file.
     var Lines: [String]!
     print("Attempting to read \(ReadmeFileURL!.path)")
     do
@@ -355,13 +380,17 @@ if FoundReadme
         print(error)
         exit(EXIT_FAILURE)
     }
+    
     var Scratch: [String] = [String]()
+    //Remove unnecessary CRLFs.
     for Line in Lines
     {
         Scratch.append(Line.replacingOccurrences(of: "\r\n", with: ""))
     }
     Lines?.removeAll()
     Lines = Scratch
+    
+    //Search for the proper line to modify, then modify it.
     if let MostRecentIndex = GetLineIndex(Lines, WhichLine: .MostRecentBuild)
     {
         var NewLine = "Most recent build: "
@@ -393,6 +422,7 @@ if FoundReadme
             Index = Index + 1
         }
         
+        //Write results back to the file system.
         print("Writing results to \((ReadmeFileURL)!)")
         let Contents: NSString = FinalContents as NSString
         do
@@ -413,3 +443,5 @@ else
 {
     print("No README.md file found.")
 }
+
+print("VersionUpdater completed.")
