@@ -83,3 +83,4 @@ The most efficient way to use VersionUpdater is as a script step in Xcode. To en
 VersionUpdater takes two command line parameters: 
 1) The project's version information file (usually `Versioning.swift`) that must be a `.swift` file.
 2) An optional read me file. The version information file must be the first parameter, and if specified, the read me file the second parameter. This must be a markdown file.
+3) An optional Info.plist file. The files short version (which is really the app's version) and version (which is really the build number) fields are updated with information from the Versioning file.
