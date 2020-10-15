@@ -53,11 +53,15 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "/Users/Stuart/Documents/GitHub/VersionUpdater/Test/README.md"
-            isEnabled = "NO">
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/Stuart/Documents/GitHub/VersionUpdater/Test/Info.plist"
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/Users/Stuart/Documents/GitHub/VersionUpdater/Test/Versioning.swift"
-            isEnabled = "NO">
+            isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
    </LaunchAction>
