@@ -15,7 +15,7 @@ Versioning for Fouris is maintained in the Versioning.swift file and is updated 
 
 Also, this versioning does not utilize Xcode's built-in versioning so I'll have to update that manually.
 
-Most recent build: **Version 1.0 Alpha, Build 3099, Build date: 29 October 2019**
+Most recent build: **Version 0.99 Alpha, Build 3106, Build date: 15 October 2020, 11:16**
 
 > This documentation and the Jazzy-created documentation do not necessarily reflect the build shown above.
 ## Implementation and Requirements
