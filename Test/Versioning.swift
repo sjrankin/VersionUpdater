@@ -30,10 +30,10 @@ import UIKit
 public class Versioning: CustomStringConvertible
 {
     /// Major version number.
-    public static let MajorVersion: String = "1"
+    public static let MajorVersion: String = "0"
     
     /// Minor version number.
-    public static let MinorVersion: String = "0"
+    public static let MinorVersion: String = "99"
     
     /// Potential version suffix.
     public static let VersionSuffix: String = ""
@@ -96,19 +96,19 @@ public class Versioning: CustomStringConvertible
     }
     
     /// Build number.
-    public static let Build: Int = 3099
+    public static let Build: Int = 3106
     
     /// Build increment.
     private static let BuildIncrement = 1
     
     /// Build ID.
-    public static let BuildID: String = "31600337-DE7A-4387-8DBD-96B2901B2377"
+    public static let BuildID: String = "47CE984C-17D9-4D05-BF2D-A248F2BB3A7B"
     
     /// Build date.
-    public static let BuildDate: String = "29 October 2019"
+    public static let BuildDate: String = "15 October 2020"
     
     /// Build Time.
-    public static let BuildTime: String = "10:51"
+    public static let BuildTime: String = "11:16"
     
     /// Return a standard build string.
     ///
