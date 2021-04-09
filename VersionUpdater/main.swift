@@ -3,7 +3,7 @@
 //  VersionUpdater
 //
 //  Created by Stuart Rankin on 2/24/18.
-//  Copyright © 2018, 2019 Stuart Rankin. All rights reserved.
+//  Copyright © 2018, 2019, 2020, 2021 Stuart Rankin. All rights reserved.
 //
 
 /// This program reads a Swift file with specific versioning information (see `GetLinePrefix` for exact strings searched for)
@@ -14,7 +14,8 @@
 /// The exact name of the files are:
 ///   - `VersionFileName` contains the name of the Swift source code with the versioning information.
 ///   - `ReadmeFileName` contains the name of the mark down read me file.
-///   - `plist` contains the name of the info plist to update.
+///   - `plist` contains the name of the info plist to update. The caller can specify multiple info.plist files
+///      on the command line and all will be processed.
 
 import Foundation
 
@@ -89,6 +90,76 @@ func GetLinePrefix(Specific: SpecificLines) -> String
     }
 }
 
+/// Returns the date and time combined.
+func PrettyDateTime() -> String
+{
+    return "\(Built) \(BuiltTime)"
+}
+
+/// Update the plist.info file whose URL is passed.
+func UpdatePList(_ PURL: URL)
+{
+    var Lines: [String]!
+    print("\(PrettyDateTime()): Attempting to read \(PURL.path)")
+    do
+    {
+        let blob = try String(contentsOfFile: PURL.path, encoding: .utf8)
+        Lines = blob.components(separatedBy: .newlines)
+    }
+    catch
+    {
+        print(error)
+        exit(EXIT_FAILURE)
+    }
+    
+    //Clean up the line.
+    var Scratch: [String] = [String]()
+    for Line in Lines
+    {
+        Scratch.append(Line.trimmingCharacters(in: .whitespacesAndNewlines))
+    }
+    Lines?.removeAll()
+    Lines = Scratch
+    
+    if let BundleKey = GetLineIndex(Lines, WhichLine: .BundleVersion)
+    {
+        Lines[BundleKey + 1] = "<string>\(BuildSequence)</string>"
+    }
+    if let BundleVer = GetLineIndex(Lines, WhichLine: .BundleShortVersion)
+    {
+        Lines[BundleVer + 1] = "<string>\(VersionMajor).\(VersionMinor)</string>"
+    }
+    
+    var FinalContents: String = ""
+    var Index = 0
+    for Line in Lines
+    {
+        var WriteMe = Line
+        if Index < Lines.count - 1
+        {
+            let Ending = String(WriteMe.suffix(1))
+            if Ending != "\n"
+            {
+                WriteMe = WriteMe + "\n"
+            }
+        }
+        FinalContents = FinalContents + WriteMe
+        Index = Index + 1
+    }
+    
+    //Write results back to the file system.
+    print("\(PrettyDateTime()): Writing results to \(PURL)")
+    let Contents: NSString = FinalContents as NSString
+    do
+        {
+            try Contents.write(toFile: PURL.path, atomically: true, encoding: String.Encoding.utf8.rawValue)
+        }
+    catch
+    {
+        print(error)
+    }
+}
+
 /// Returns the line index for the specified line.
 /// - Parameter Lines: List of lines in which we search for a specific line type.
 /// - Parameter WhichLine: The line we are looking for.
@@ -158,19 +229,18 @@ let Arguments = CommandLine.arguments
 var VersionFileName = "Versioning.swift"
 /// Default read me file name.
 var ReadmeFileName = "README.md"
+/// Project Info.plist file.
 var plist = "Info.plist"
 /// Found the versioning file flag.
 var FoundVersioning = false
 /// Found the read me file file.
 var FoundReadme = false
-/// Found the plist file.
-var FoundPlist = false
 /// URL of the version file.
 var VersionFileURL: URL? = nil
 /// URL of the read me file.
 var ReadmeFileURL: URL? = nil
-/// URL of the info.plist file.
-var plistURL: URL? = nil
+/// Set of PList.info file URLs.
+var PListList = Set<URL>()
 
 /// Read the command line arguments and look for the specific read me and versioning files.
 /// Main entry point for the program.
@@ -200,11 +270,10 @@ for arg in CommandLine.arguments
     }
     if Name.contains(plist)
     {
-        plistURL = SomeURL
-        FoundPlist = true
-        if !FileManager.default.fileExists(atPath: plistURL!.path)
+        PListList.insert(SomeURL)
+        if !FileManager.default.fileExists(atPath: SomeURL.path)
         {
-            print("Cannot find \(plistURL!).")
+            print("Cannot find \(SomeURL.path)")
             exit(EXIT_FAILURE)
         }
     }
@@ -470,80 +539,18 @@ else
     print("No README.md file found.")
 }
 
-if FoundPlist
+// If there are info.plist files specified, update them all.
+if !PListList.isEmpty
 {
     if !FoundVersioning
     {
-        print("Unable to update \((plistURL)!) due to lack of versioning information.")
+        print("Unable to update plist.info files due to lack of versioning information.")
         exit(EXIT_FAILURE)
     }
     
-    if !FoundVersioning
+    for SomeURL in PListList
     {
-        print("Unable to update \((plistURL)!) due to lack of versioning information.")
-        exit(EXIT_FAILURE)
-    }
-    
-    //Read the read me file.
-    var Lines: [String]!
-    print("Attempting to read \(plistURL!.path)")
-    do
-    {
-        let blob = try String(contentsOfFile: plistURL!.path, encoding: .utf8)
-        Lines = blob.components(separatedBy: .newlines)
-        print("Read \(Lines.count) lines in \((plistURL)!)")
-    }
-    catch
-    {
-        print(error)
-        exit(EXIT_FAILURE)
-    }
-    
-    var Scratch: [String] = [String]()
-    //Clean up the line.
-    for Line in Lines
-    {
-        Scratch.append(Line.trimmingCharacters(in: .whitespacesAndNewlines))
-    }
-    Lines?.removeAll()
-    Lines = Scratch
-    
-    if let BundleKey = GetLineIndex(Lines, WhichLine: .BundleVersion)
-    {
-        Lines[BundleKey + 1] = "<string>\(BuildSequence)</string>"
-    }
-    if let BundleVer = GetLineIndex(Lines, WhichLine: .BundleShortVersion)
-    {
-        Lines[BundleVer + 1] = "<string>\(VersionMajor).\(VersionMinor)</string>"
-    }
-    
-    var FinalContents: String = ""
-    var Index = 0
-    for Line in Lines
-    {
-        var WriteMe = Line
-        if Index < Lines.count - 1
-        {
-            let Ending = String(WriteMe.suffix(1))
-            if Ending != "\n"
-            {
-                WriteMe = WriteMe + "\n"
-            }
-        }
-        FinalContents = FinalContents + WriteMe
-        Index = Index + 1
-    }
-    
-    //Write results back to the file system.
-    print("Writing results to \((plistURL)!)")
-    let Contents: NSString = FinalContents as NSString
-    do
-        {
-            try Contents.write(toFile: plistURL!.path, atomically: true, encoding: String.Encoding.utf8.rawValue)
-        }
-    catch
-    {
-        print(error)
+        UpdatePList(SomeURL)
     }
 }
 
