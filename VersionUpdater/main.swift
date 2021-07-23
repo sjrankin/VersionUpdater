@@ -100,7 +100,7 @@ func PrettyDateTime() -> String
 func UpdatePList(_ PURL: URL)
 {
     var Lines: [String]!
-    print("\(PrettyDateTime()): Attempting to read \(PURL.path)")
+    //print("\(PrettyDateTime()): Attempting to read \(PURL.path)")
     do
     {
         let blob = try String(contentsOfFile: PURL.path, encoding: .utf8)
@@ -148,7 +148,7 @@ func UpdatePList(_ PURL: URL)
     }
     
     //Write results back to the file system.
-    print("\(PrettyDateTime()): Writing results to \(PURL)")
+    //print("\(PrettyDateTime()): Writing results to \(PURL)")
     let Contents: NSString = FinalContents as NSString
     do
         {
@@ -298,7 +298,7 @@ if FoundVersioning
     //Read the versioning information.
     var Lines: [String]!
     var blob: String = ""
-    print("Attempting to read \(VersionFileURL!.path)")
+    //print("Attempting to read \(VersionFileURL!.path)")
     do
     {
         blob = try String(contentsOfFile: VersionFileURL!.path, encoding: .utf8)
@@ -309,7 +309,7 @@ if FoundVersioning
         exit(EXIT_FAILURE)
     }
     Lines = blob.components(separatedBy: .newlines)
-    print("Read \(Lines.count) lines in \((VersionFileURL)!)")
+    //print("Read \(Lines.count) lines in \((VersionFileURL)!)")
     var Scratch: [String] = [String]()
     for Line in Lines
     {
@@ -436,7 +436,7 @@ if FoundVersioning
     }
     
     //Save the updated version file.
-    print("Writing results to \((VersionFileURL)!)")
+    //print("Writing results to \((VersionFileURL)!)")
     let Contents: NSString = FinalContents as NSString
     do
     {
@@ -463,7 +463,7 @@ if FoundReadme
     
     //Read the read me file.
     var Lines: [String]!
-    print("Attempting to read \(ReadmeFileURL!.path)")
+    //print("Attempting to read \(ReadmeFileURL!.path)")
     do
     {
         let blob = try String(contentsOfFile: ReadmeFileURL!.path, encoding: .utf8)
@@ -518,7 +518,7 @@ if FoundReadme
         }
         
         //Write results back to the file system.
-        print("Writing results to \((ReadmeFileURL)!)")
+        //print("Writing results to \((ReadmeFileURL)!)")
         let Contents: NSString = FinalContents as NSString
         do
         {
